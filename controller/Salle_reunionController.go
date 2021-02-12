@@ -3,10 +3,10 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
-	"rh-projet/model"
 	u "rh-projet/utils"
 	"strconv"
 	"time"
+	"rh-projet/model"
 
 	"github.com/gorilla/mux"
 )

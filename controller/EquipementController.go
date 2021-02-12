@@ -31,6 +31,13 @@ var AfficherEquipement = func(w http.ResponseWriter, r *http.Request) {
 	resp["data"] = data
 	u.Respond(w, resp)
 }
+var AfficherDisEquipement = func(w http.ResponseWriter, r *http.Request, nb_equipement int) {
+
+	data := model.AfficherDisEquipement(nb_equipement)
+	resp := u.Message("Tous les equipements disponible")
+	resp["data"] = data
+	u.Respond(w, resp)
+}
 var SupprimerEquipement = func(w http.ResponseWriter, r *http.Request) {
 
 	params := mux.Vars(r)
@@ -83,6 +90,19 @@ var AfficherEqui = func(w http.ResponseWriter, r *http.Request) {
 	}
 	data := model.AfficherParEqui(idInt)
 	resp := u.Message("Equipement")
+	resp["data"] = data
+	u.Respond(w, resp)
+}
+
+var AfficherUserEqui = func(w http.ResponseWriter, r *http.Request) {
+
+	paramss := mux.Vars(r)
+	id_user := paramss["user_id"]
+	idUser, err := strconv.Atoi(id_user)
+	if err != nil {
+	}
+	data := model.AfficherUserEqui(idUser)
+	resp := u.Message("Formations")
 	resp["data"] = data
 	u.Respond(w, resp)
 }

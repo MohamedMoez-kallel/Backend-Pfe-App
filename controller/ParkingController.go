@@ -3,9 +3,9 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
-	"rh-projet/model"
 	u "rh-projet/utils"
 	"strconv"
+	"rh-projet/model"
 
 	"github.com/gorilla/mux"
 )
@@ -57,7 +57,7 @@ var Affecter = func(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//fmt.Println(b.UserId)
-	data := model.AffecterPlaceParking(b.UserId,b.Date_debut,b.Date_fin,b.Matricule)
+	data := model.AffecterPlaceParking(b.UserId, b.Date_debut, b.Date_fin, b.Matricule)
 	resp := u.Message("Utilisateur affecter à une place parking")
 	resp[""] = data
 	u.Respond(w, resp)
@@ -91,5 +91,15 @@ var ModifierParking = func(w http.ResponseWriter, r *http.Request) {
 	resp := u.Message("Utilisateur modifier avec succès")
 	resp["data"] = data
 	u.Respond(w, resp)
-
+}
+var AfficherParPlace = func(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	id := params["id"]
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+	}
+	data := model.AfficherParPlace(idInt)
+	resp := u.Message("Place Parking")
+	resp["data"] = data
+	u.Respond(w, resp)
 }

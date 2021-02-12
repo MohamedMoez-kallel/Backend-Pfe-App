@@ -1,4 +1,4 @@
-module github.com/user/rh-projet
+// module github.com/user/rh-projet
 
 go 1.12
 

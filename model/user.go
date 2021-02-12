@@ -17,26 +17,9 @@ type Token struct {
 	jwt.StandardClaims
 }
 
-// type Role string
-
-// const (
-// 	Admin   Role = "Admin"
-// 	Employe      = "Employe"
-// )
-
-// const (
-// 	Admin   = Role("Admin")
-// 	Employe = Role("Employe")
-// )
-
-// var Role =[]string{
-// 	"Admin",
-// 	"Employe",
-// }
-
 type User struct {
 	//gorm.Model
-	Id                 int
+	Id                 int     `json:"id"`
 	Nom                string  `json:"nom"`
 	Prenom             string  `json:"prenom"`
 	Date_naissance     string  `json:"date_naissance"`
@@ -53,7 +36,7 @@ type User struct {
 	Token              string  `json:"token"`
 	Sexe               string  `json:"sexe"`
 	Lieu               string  `json:"lieu"`
-	//Role               Role    `json:"role"`
+	Avantage           string  `json:"avantage"`
 }
 
 func (user *User) Validate(w http.ResponseWriter, r *http.Request) (map[string]interface{}, bool) {
@@ -160,6 +143,7 @@ func Login(w http.ResponseWriter, r *http.Request, email, password, nom, departe
 	resp["Departement"] = user.Departement
 	resp["Email"] = user.Email
 	resp["Token"] = user.Token
+	resp["Nom"] = user.Nom
 
 	return resp
 }

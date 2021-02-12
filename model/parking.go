@@ -73,3 +73,9 @@ func ModifierParking(parking *Parking) *Parking {
 	db.Save(&parking)
 	return parking
 }
+
+func AfficherParPlace(id int) *Parking {
+	var parking Parking
+	GetDB().Table("parkings").Where("id = ?", id).Find(&parking)
+	return &parking
+}

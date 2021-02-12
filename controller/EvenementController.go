@@ -3,15 +3,14 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
-	"rh-projet/model"
 	u "rh-projet/utils"
 	"strconv"
-
+	"rh-projet/model"
 	"github.com/gorilla/mux"
 )
 
 var AjouterEvenement = func(w http.ResponseWriter, r *http.Request) {
-	
+
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	evenement := &model.Evenement{}
 	err := json.NewDecoder(r.Body).Decode(evenement)
@@ -32,7 +31,7 @@ var AfficherEvenement = func(w http.ResponseWriter, r *http.Request) {
 	u.Respond(w, resp)
 }
 var SupprimerEvenement = func(w http.ResponseWriter, r *http.Request) {
-	
+
 	params := mux.Vars(r)
 	id := params["id"]
 	idInt, err := strconv.Atoi(id)
@@ -44,7 +43,7 @@ var SupprimerEvenement = func(w http.ResponseWriter, r *http.Request) {
 	u.Respond(w, resp)
 }
 var ModifierEvenement = func(w http.ResponseWriter, r *http.Request) {
-	
+
 	params := mux.Vars(r)
 	id := params["id"]
 	idInt, err := strconv.Atoi(id)
@@ -66,7 +65,7 @@ var ModifierEvenement = func(w http.ResponseWriter, r *http.Request) {
 }
 
 var RechercheEvenement = func(w http.ResponseWriter, r *http.Request) {
-	
+
 	vars := mux.Vars(r)
 	title := vars["title"]
 	evenement := model.RechercheEvenement(title)
@@ -91,6 +90,37 @@ var AfficherEve = func(w http.ResponseWriter, r *http.Request) {
 	}
 	data := model.AfficherParEve(idInt)
 	resp := u.Message("Evenement")
+	resp["data"] = data
+	u.Respond(w, resp)
+}
+var AfficherUserEve = func(w http.ResponseWriter, r *http.Request) {
+
+	paramss := mux.Vars(r)
+	id_user := paramss["user_id"]
+	idUser, err := strconv.Atoi(id_user)
+	if err != nil {
+	}
+	data := model.AfficherUserEve(idUser)
+	resp := u.Message("Mes Evenement")
+	resp["data"] = data
+	u.Respond(w, resp)
+}
+
+type ParticipationEvenement struct {
+	EvenementID  int          `json:"evenement_id"`
+	Participants []model.User `json:"participants"`
+}
+
+var ReserverEvenement = func(w http.ResponseWriter, r *http.Request) {
+
+	var b *ParticipationEvenement
+	err := json.NewDecoder(r.Body).Decode(&b)
+	if err != nil {
+		u.Responds(w, u.Messages("Requête invalide"))
+		return
+	}
+	data := model.ReserverEvenement(b.Participants, b.EvenementID)
+	resp := u.Message("Utilisateur a reserver une place a l'evenement")
 	resp["data"] = data
 	u.Respond(w, resp)
 }

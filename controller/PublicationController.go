@@ -3,10 +3,11 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
-	"rh-projet/model"
 	u "rh-projet/utils"
 	"strconv"
+	"rh-projet/model"
 
+	
 	"github.com/gorilla/mux"
 )
 
@@ -44,17 +45,30 @@ var SupprimerPublication = func(w http.ResponseWriter, r *http.Request) {
 	resp["data"] = data
 	u.Respond(w, resp)
 }
-var AfficherPub =func (w  http.ResponseWriter, r *http.Request){
+var AfficherPub = func(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id := params["id"]
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
 	}
-	data :=model.AfficherParPub(idInt)
+	data := model.AfficherParPub(idInt)
 	resp := u.Message("Publication")
 	resp["data"] = data
 	u.Respond(w, resp)
 }
+var AfficherUserPub = func(w http.ResponseWriter, r *http.Request) {
+
+	paramss := mux.Vars(r)
+	id_user := paramss["user_id"]
+	idUser, err := strconv.Atoi(id_user)
+	if err != nil {
+	}
+	data := model.AfficherUserPub(idUser)
+	resp := u.Message("Publication")
+	resp["data"] = data
+	u.Respond(w, resp)
+}
+
 var ModifierPublications = func(w http.ResponseWriter, r *http.Request) {
 
 	params := mux.Vars(r)
@@ -85,4 +99,3 @@ var RecherchePublication = func(w http.ResponseWriter, r *http.Request) {
 	resp["Publication"] = publication
 	u.Respond(w, resp)
 }
-

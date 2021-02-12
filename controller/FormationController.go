@@ -4,10 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"rh-projet/model"
 	u "rh-projet/utils"
 	"strconv"
-
+	"rh-projet/model"
 	"github.com/gorilla/mux"
 )
 
@@ -79,7 +78,7 @@ var RechercheFormation = func(w http.ResponseWriter, r *http.Request) {
 var AfficherFormationDate = func(w http.ResponseWriter, r *http.Request) {
 
 	data := model.AfficherFormationDate()
-	resp := u.Message("Formation à partir du date d'aujourd'hui  ")
+	resp := u.Message("Formation à partir du date d'aujourd'hui")
 	resp["data"] = data
 
 	u.Respond(w, resp)
@@ -93,6 +92,38 @@ var AfficherFor = func(w http.ResponseWriter, r *http.Request) {
 	}
 	data := model.AfficherParFor(idInt)
 	resp := u.Message("Formation")
+	resp["data"] = data
+	u.Respond(w, resp)
+}
+var AfficherUserFor = func(w http.ResponseWriter, r *http.Request) {
+
+	paramss := mux.Vars(r)
+	id_user := paramss["user_id"]
+	idUser, err := strconv.Atoi(id_user)
+	if err != nil {
+	}
+	data := model.AfficherUserFor(idUser)
+	resp := u.Message("Formations")
+	resp["data"] = data
+	u.Respond(w, resp)
+}
+
+type ParticipationRequest struct {
+	FormationID  int          `json:"formation_id"`
+	Participants []model.User `json:"participants"`
+}
+
+var Reserver = func(w http.ResponseWriter, r *http.Request) {
+
+	var b *ParticipationRequest
+	err := json.NewDecoder(r.Body).Decode(&b)
+	if err != nil {
+		u.Responds(w, u.Messages("Requête invalide"))
+		return
+	}
+	//fmt.Println(b.UserId)
+	data := model.ReserverFormation(b.Participants, b.FormationID)
+	resp := u.Message("Utilisateur a reserver une place")
 	resp["data"] = data
 	u.Respond(w, resp)
 }

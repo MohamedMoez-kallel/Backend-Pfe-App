@@ -15,6 +15,7 @@ type Equipement struct {
 	Prix            float64 `json:"prix"`
 	Fournisseur     string  `json:"fournisseur"`
 	Num_serie       string  `json:"num_serie"`
+	UserId          int     `json:"user_id"`
 }
 
 func (equipement *Equipement) AjouterEquipement(w http.ResponseWriter, r *http.Request) map[string]interface{} {
@@ -59,4 +60,19 @@ func AfficherParEqui(id int) *Equipement {
 	var equipement Equipement
 	GetDB().Table("equipements").Where("id = ?", id).Find(&equipement)
 	return &equipement
+}
+func AfficherDisEquipement(nb_equipement int) []*Equipement {
+
+	equipement := []*Equipement{}
+	err := GetDB().Table("equipements").Where("nb_equipement > 0", nb_equipement).Find(&equipement).Error
+	if err != nil {
+		return nil
+	}
+	return equipement
+}
+
+func AfficherUserEqui(user_id int) []*Equipement {
+	equipement := []*Equipement{}
+	GetDB().Table("equipements").Where(" user_id =?", user_id).Find(&equipement)
+	return equipement
 }

@@ -2,11 +2,16 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
+	"io"
+	"log"
 	"net/http"
+	"os"
 	"rh-projet/model"
 	u "rh-projet/utils"
 	"strconv"
 
+	"github.com/gin-gonic/gin"
 	"github.com/gorilla/mux"
 )
 
@@ -21,6 +26,7 @@ var AjouterUser = func(w http.ResponseWriter, r *http.Request) {
 	resp := user.InsertUser(w, r)
 	u.Respond(w, resp)
 }
+
 var AfficherUser = func(w http.ResponseWriter, r *http.Request) {
 
 	data := model.AfficherUser()
@@ -41,6 +47,7 @@ var SupprimerUser = func(w http.ResponseWriter, r *http.Request) {
 	resp["data"] = data
 	u.Respond(w, resp)
 }
+
 var ModifierUtilisateur = func(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id := params["id"]

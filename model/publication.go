@@ -8,9 +8,14 @@ import (
 
 type Publication struct {
 	//gorm.Model
-	Id          int
-	Titre       string `json:"titre"`
-	Description string `json:"description"`
+	Id           int
+	Titre        string `json:"titre"`
+	Description  string `json:"description"`
+	NumberOfLike int    `json:"numberOfLike"`
+	User         User
+	UserId       int `json:"user_id"`
+	PublicationAnswer []Answer `gorm:"many2many:publication_answer;"`
+
 }
 
 func (publication *Publication) InsertPublication(w http.ResponseWriter, r *http.Request) map[string]interface{} {
@@ -30,21 +35,27 @@ func AfficherPublication() []*Publication {
 	return publication
 }
 
-func AfficherPub(id int)[]*Publication{
+func AfficherPub(id int) []*Publication {
 	publications := make([]*Publication, 0)
 	err := GetDB().Table("publications").Where("id = ?", id).Find(&publications).Error
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
-	
+
 	return publications
 }
 
-func AfficherParPub(id int) *Publication{
-	var publication Publication 
+func AfficherParPub(id int) *Publication {
+	var publication Publication
 	GetDB().Table("publications").Where("id = ?", id).Find(&publication)
 	return &publication
+}
+
+func AfficherUserPub(user_id int) []*Publication {
+	publication := []*Publication{}
+	GetDB().Table("publications").Where(" user_id =?", user_id).Find(&publication)
+	return publication
 }
 
 func DeletPublication(id int) *Publication {
@@ -67,3 +78,4 @@ func RecherchePublication(title string) []*Publication {
 	GetDB().Table("publications").Where("titre LIKE ? ", title).Find(&publication)
 	return publication
 }
+

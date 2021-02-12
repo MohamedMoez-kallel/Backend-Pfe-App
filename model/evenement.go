@@ -14,17 +14,20 @@ type Evenement struct {
 	Emplacement          string `json:"emplacement"`
 	Description          string `json:"description"`
 	Photo                string `json:"photo"`
+	//User                 User
+	UserId       int    `json:"user_id"`
+	Participants []User `gorm:"many2many:evenement_users;"`
 }
 
 func (evenement *Evenement) AjouterEvenement(w http.ResponseWriter, r *http.Request) map[string]interface{} {
-	
+
 	GetDB().Create(evenement)
 	response := u.Message("Evenement ajouter")
 	return response
 }
 
 func AfficherEvenement() []*Evenement {
-	
+
 	evenement := []*Evenement{}
 	err := GetDB().Table("evenements").Find(&evenement).Error
 	if err != nil {
@@ -34,7 +37,7 @@ func AfficherEvenement() []*Evenement {
 }
 
 func DeletEvenement(id int) *Evenement {
-	
+
 	var evenement Evenement
 	GetDB().First(&evenement, id)
 	db.Delete(&evenement)
@@ -42,7 +45,7 @@ func DeletEvenement(id int) *Evenement {
 }
 
 func ModifierEvenement(evenement *Evenement) *Evenement {
-	
+
 	db.Save(&evenement)
 	return evenement
 }
@@ -55,7 +58,7 @@ func RechercheEvenement(title string) []*Evenement {
 }
 
 func AfficherEvenementDate() []*Evenement {
-	
+
 	evenement := []*Evenement{}
 	err := GetDB().Table("evenements").Where("Date_debut_evenement >= ?", time.Now()).Find(&evenement).Error
 	if err != nil {
@@ -63,8 +66,24 @@ func AfficherEvenementDate() []*Evenement {
 	}
 	return evenement
 }
-func AfficherParEve(id int) *Evenement{
-	var evenement Evenement 
+func AfficherParEve(id int) *Evenement {
+	var evenement Evenement
 	GetDB().Table("evenements").Where("id = ?", id).Find(&evenement)
 	return &evenement
+}
+func AfficherUserEve(user_id int) []*Evenement {
+	evenement := []*Evenement{}
+	GetDB().Table("evenements").Where(" user_id =?", user_id).Find(&evenement)
+	return evenement
+}
+func ReserverEvenement(participants []User, evenementID int) *Evenement {
+	var evenement Evenement
+	evenement.Id = evenementID
+
+	if err := db.First(&evenement).Error; err != nil {
+		panic(err)
+	}
+	db.Model(&evenement).Association("Participants").Append(participants)
+	return &evenement
+
 }
