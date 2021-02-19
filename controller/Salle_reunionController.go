@@ -2,19 +2,20 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"rh-projet/model"
 	u "rh-projet/utils"
 	"strconv"
 	"time"
-	"rh-projet/model"
 
 	"github.com/gorilla/mux"
 )
 
 type SalleBody struct {
 	Date_debut  string    `json:"date_debut"`
-	Heure_debut time.Time `json:"heure_debut"`
-	Heure_fin   time.Time `json:"heure_fin"`
+	Heure_debut string`json:"heure_debut"`
+	Heure_fin   string `json:"heure_fin"`
 	UserId      int       `json:"user_id"`
 }
 
@@ -83,9 +84,24 @@ var ReserverSalle = func(w http.ResponseWriter, r *http.Request) {
 		u.Responds(w, u.Messages("Requête invalide"))
 		return
 	}
-	//fmt.Println(b.UserId)
-	data := model.ReserverSalle(b.UserId, b.Date_debut, b.Heure_debut, b.Heure_fin)
-	resp := u.Message("Salle réserver")
-	resp[""] = data
-	u.Respond(w, resp)
+	fmt.Println(*b)
+	heureDebut, err := time.Parse(time.RFC3339, b.Heure_debut)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("failed heure debut %v", err))
+	}
+	heureFin, err := time.Parse(time.RFC3339, b.Heure_fin)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("failed heure fin %v", err))
+	}
+	fmt.Println(heureDebut)
+	//data := model.ReserverSalle(b.UserId, b.Date_debut, heureDebut, heureFin)
+	// resp := u.Message("Salle réserver")
+	// resp["data"] = resp
+	resp := make(map[string]interface{})
+	resp["dateDebut"] = heureDebut
+	resp["dateFin"] = heureFin
+	//u.Respond(w, resp)
+	data, err := json.Marshal(resp)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(data)
 }
