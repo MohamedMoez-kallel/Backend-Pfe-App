@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"net/http"
 	u "rh-projet/utils"
 	"time"
@@ -43,21 +44,38 @@ func ModifierSalle(salle *Salle_reunion) *Salle_reunion {
 	return salle
 }
 
-func ReserverSalle(user_id int, Date_debut string, Heure_debut, Heure_fin time.Time) *Salle_reunion {
-	var result int
-	salle := []*Salle_reunion{}
-	db.Table("salle_reunions").Where("user_id=0").Count(&result)
-	err := GetDB().Table("salle_reunions").Where("user_id=0").Find(&salle).Error
+func ReserverSalle(user_id int, Date_debut string, heure_debut, heure_fin time.Time) *Salle_reunion {
+	// var result int
+	// salle := []*Salle_reunion{}
+	// db.Table("salle_reunions").Where("user_id=0").Count(&result)
+	// err := GetDB().Table("salle_reunions").Where("user_id=0").Find(&salle).Error
+	// if err != nil {
+	// 	return nil
+	// }
+	// if result > 0 {
+	// 	salle[0].UserId = user_id
+	// 	salle[0].Date_debut = Date_debut
+	// 	salle[0].Heure_debut = Heure_debut
+	// 	salle[0].Heure_fin = Heure_fin
+
+	// 	db.Table("salle_reunions").Save(&salle[0])
+	// }
+	// return salle[0]
+	salles := []Salle_reunion{}
+	err := GetDB().Model(&Salle_reunion{}).Where("user_id = ?", user_id).Find(salles).Error
 	if err != nil {
+		fmt.Println(err)
+	}
+	if len(salles) <= 0 {
 		return nil
 	}
-	if result > 0 {
-		salle[0].UserId = user_id
-		salle[0].Date_debut = Date_debut
-		salle[0].Heure_debut = Heure_debut
-		salle[0].Heure_fin = Heure_fin
-
-		db.Table("salle_reunions").Save(&salle[0])
+	var salle = salles[0]
+	salle.UserId = user_id
+	salle.Heure_debut = heure_debut
+	salle.Heure_fin = heure_fin
+	err = GetDB().Model(&Salle_reunion{}).Updates(&salle).Error
+	if err != nil {
+		fmt.Println(err)
 	}
-	return salle[0]
+	return &salle
 }
