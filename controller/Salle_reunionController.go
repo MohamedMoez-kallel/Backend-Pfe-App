@@ -94,14 +94,10 @@ var ReserverSalle = func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(fmt.Sprintf("failed heure fin %v", err))
 	}
 	fmt.Println(heureDebut)
-	//data := model.ReserverSalle(b.UserId, b.Date_debut, heureDebut, heureFin)
-	// resp := u.Message("Salle réserver")
-	// resp["data"] = resp
+	data := model.ReserverSalle(b.UserId, b.Date_debut, heureDebut, heureFin)
 	resp := make(map[string]interface{})
-	resp["dateDebut"] = heureDebut
-	resp["dateFin"] = heureFin
-	//u.Respond(w, resp)
-	data, err := json.Marshal(resp)
+	resp["data"] = &data
+	response, err := json.Marshal(resp)
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(data)
+	w.Write(response)
 }

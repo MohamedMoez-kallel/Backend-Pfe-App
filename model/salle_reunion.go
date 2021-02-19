@@ -62,7 +62,7 @@ func ReserverSalle(user_id int, Date_debut string, heure_debut, heure_fin time.T
 	// }
 	// return salle[0]
 	salles := []Salle_reunion{}
-	err := GetDB().Model(&Salle_reunion{}).Where("user_id = ?", user_id).Find(salles).Error
+	err := GetDB().Model(&Salle_reunion{}).Where("user_id = ?", 0).Find(salles).Error
 	if err != nil {
 		fmt.Println(err)
 	}
