@@ -3,25 +3,46 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
+	"io/ioutil"
 	"net/http"
+	"os"
+	"path/filepath"
+	"rh-projet/model"
 	u "rh-projet/utils"
 	"strconv"
-	"rh-projet/model"
-	"github.com/gorilla/mux"
 )
 
 var AjouterFormation = func(w http.ResponseWriter, r *http.Request) {
-
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	formation := &model.Formation{}
-	err := json.NewDecoder(r.Body).Decode(formation)
-	if err != nil {
-		u.Responds(w, u.Messages("Requête invalide"))
-		return
+	if r.Method == "POST" {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		nb_place, _ := strconv.ParseInt(r.FormValue("Nb_place"), 10, 64)
+		photo, err := UploadFileHandler(r)
+		if err != nil {
+			return
+		}
+		formation := &model.Formation{
+			Heure_formation: r.FormValue("heure_formation"),
+			Date_formation:  r.FormValue("date_formation"),
+			Titre:           r.FormValue("titre"),
+			Description:     r.FormValue("description"),
+			Formateur:       r.FormValue("formateur"),
+			Nb_place:        nb_place,
+			Type_formation:  r.FormValue("type_formation"),
+			Photo:           photo.FileName,
+		}
+		newPath := filepath.Join(".", "C:/Users/Moez/Rh-Projet-Client/src/assets/image/")
+		err = os.MkdirAll(newPath, os.ModePerm)
+		if err != nil {
+			fmt.Println((err))
+		}
+		err = ioutil.WriteFile(newPath+"/"+photo.FileName+photo.Extension, photo.FileBytes, 0644)
+		if err != nil {
+			fmt.Println((err))
+		}
+		resp := formation.InsertFormation(w, r)
+		u.Respond(w, resp)
 	}
-
-	resp := formation.InsertFormation(w, r)
-	u.Respond(w, resp)
 }
 
 var AfficherFormation = func(w http.ResponseWriter, r *http.Request) {

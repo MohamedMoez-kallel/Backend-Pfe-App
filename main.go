@@ -17,8 +17,8 @@ func main() {
 	router := mux.NewRouter()
 	//USER//
 
-	router.HandleFunc("/file", controller.UploadFiles).Methods("POST")
-	router.HandleFunc("/UploadFiles", controller.UploadFiles).Methods("POST")
+	// router.HandleFunc("/file", controller.UploadFiles).Methods("POST")
+	// router.HandleFunc("/UploadFiles", controller.UploadFiles).Methods("POST")
 
 	router.HandleFunc("/new/utilisateur", controller.AjouterUser).Methods("POST")
 	router.HandleFunc("/afficher/utilisateur", controller.AfficherUser).Methods("GET")

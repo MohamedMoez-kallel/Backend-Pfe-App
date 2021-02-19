@@ -72,6 +72,7 @@ func (user *User) InsertUser(w http.ResponseWriter, r *http.Request) map[string]
 	}
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	user.Password = string(hashedPassword)
+	
 	GetDB().Create(user)
 	user.Password = "" //delete password
 	response := u.Message("Compte a été créé")
