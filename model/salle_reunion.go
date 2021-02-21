@@ -1,20 +1,18 @@
 package model
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
 	u "rh-projet/utils"
 	"time"
+
+	"github.com/jinzhu/gorm"
 )
 
 type Salle_reunion struct {
-	Id          int
-	Num_salle   int       `json:"num_salle"`
-	Date_debut  string    `json:"date_debut"`
-	Heure_debut time.Time `json:"heure_debut"`
-	Heure_fin   time.Time `json:"heure_fin"`
-	User        User
-	UserId      int `json:"user_id"`
+	gorm.Model
+	NomSalle     string        `json:"nom_salle"`
+	Reservations []Reservation `json:"reservations" gorm:"foreignKey:SalleId"`
 }
 
 func (salle_reunion *Salle_reunion) InsertSalleReunion(w http.ResponseWriter, r *http.Request) map[string]interface{} {
@@ -44,38 +42,34 @@ func ModifierSalle(salle *Salle_reunion) *Salle_reunion {
 	return salle
 }
 
-func ReserverSalle(user_id int, Date_debut string, heure_debut, heure_fin time.Time) *Salle_reunion {
-	// var result int
-	// salle := []*Salle_reunion{}
-	// db.Table("salle_reunions").Where("user_id=0").Count(&result)
-	// err := GetDB().Table("salle_reunions").Where("user_id=0").Find(&salle).Error
-	// if err != nil {
-	// 	return nil
-	// }
-	// if result > 0 {
-	// 	salle[0].UserId = user_id
-	// 	salle[0].Date_debut = Date_debut
-	// 	salle[0].Heure_debut = Heure_debut
-	// 	salle[0].Heure_fin = Heure_fin
+func ReserverSalle(salleId, userId int, Date_debut string, heure_debut, heure_fin time.Time) (*Salle_reunion, error) {
+	var salle Salle_reunion
+	err := GetDB().Model(&salle).Where("id = ?", salleId).First(&salle).Error
+	if err != nil {
+		return nil, err
+	}
+	err = GetDB().Model(&salle).Related(&salle.Reservations, "Reservations").Error
+	if err != nil {
+		return nil, err
+	}
+	for _, reservation := range salle.Reservations {
+		if inTimeSpan(reservation.Heure_debut, reservation.Heure_fin, heure_debut) {
+			return nil, errors.New("there is a reserved session! try with another time slot")
+		}
+	}
+	err = GetDB().Model(&salle).Association("Reservations").Append([]Reservation{
+		{
+			Heure_debut: heure_debut,
+			Heure_fin:   heure_fin,
+			UserId:      userId,
+		},
+	}).Error
+	if err != nil {
+		return nil, err
+	}
+	return &salle, nil
+}
 
-	// 	db.Table("salle_reunions").Save(&salle[0])
-	// }
-	// return salle[0]
-	salles := []Salle_reunion{}
-	err := GetDB().Model(&Salle_reunion{}).Where("user_id = ?", 0).Find(salles).Error
-	if err != nil {
-		fmt.Println(err)
-	}
-	if len(salles) <= 0 {
-		return nil
-	}
-	var salle = salles[0]
-	salle.UserId = user_id
-	salle.Heure_debut = heure_debut
-	salle.Heure_fin = heure_fin
-	err = GetDB().Model(&Salle_reunion{}).Updates(&salle).Error
-	if err != nil {
-		fmt.Println(err)
-	}
-	return &salle
+func inTimeSpan(start, end, check time.Time) bool {
+    return check.After(start) && check.Before(end)
 }
